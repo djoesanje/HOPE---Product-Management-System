@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import toast from 'react-hot-toast';
 
@@ -18,19 +18,18 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const withTimeout = (promise, ms = 5000) => {
-    return Promise.race([
-      promise,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Auth request timed out')), ms)
-      )
-    ]);
+  // Ref so the onAuthStateChange closure always sees the latest currentUser
+  // without needing to re-subscribe every time it changes.
+  const currentUserRef = useRef(null);
+  const setCurrentUserAndRef = (user) => {
+    currentUserRef.current = user;
+    setCurrentUser(user);
   };
 
   useEffect(() => {
     let cancelled = false;
 
-    withTimeout(supabase.auth.getSession())
+    supabase.auth.getSession()
       .then(({ data: { session } }) => {
         if (cancelled) return;
 
@@ -46,7 +45,7 @@ export function AuthProvider({ children }) {
 
         console.error('Auth initialization failed:', error);
         setSession(null);
-        setCurrentUser(null);
+        setCurrentUserAndRef(null);
         setLoading(false);
       });
 
@@ -54,11 +53,17 @@ export function AuthProvider({ children }) {
       setSession(session);
 
       if (event === 'SIGNED_IN' && session) {
-        await checkUserStatus(session);
+        // Guard: skip if the user is already loaded (prevents re-running
+        // checkUserStatus when Supabase fires SIGNED_IN after a token refresh).
+        if (!currentUserRef.current) {
+          await checkUserStatus(session);
+        }
       } else if (event === 'SIGNED_OUT') {
-        setCurrentUser(null);
+        setCurrentUserAndRef(null);
         setLoading(false);
       }
+      // TOKEN_REFRESHED: setSession above already stores the new session.
+      // No need to re-verify the user row on every token refresh.
     });
 
     return () => {
@@ -69,17 +74,15 @@ export function AuthProvider({ children }) {
 
   const checkUserStatus = async (session) => {
     try {
-      const { data: userRow, error: userError } = await withTimeout(
-        supabase
-          .from('user')
-          .select('userid, username, lastname, firstname, user_type, record_status')
-          .eq('userid', session.user.id)
-          .maybeSingle()
-      );
+      const { data: userRow, error: userError } = await supabase
+        .from('user')
+        .select('userid, username, lastname, firstname, user_type, record_status')
+        .eq('userid', session.user.id)
+        .maybeSingle();
 
       if (userError) {
         console.error('Error fetching user:', userError);
-        setCurrentUser(null);
+        setCurrentUserAndRef(null);
         setError('Failed to load user data. Please contact an administrator.');
         setLoading(false);
         supabase.auth.signOut().catch(console.error);
@@ -87,7 +90,7 @@ export function AuthProvider({ children }) {
       }
 
       if (!userRow) {
-        setCurrentUser(null);
+        setCurrentUserAndRef(null);
         setError('Your account has been created, but your app profile is not ready yet. Please wait for administrator activation.');
         toast.error('Your account needs administrator activation before you can continue.');
         setLoading(false);
@@ -96,7 +99,7 @@ export function AuthProvider({ children }) {
       }
 
       if (userRow.record_status !== 'ACTIVE') {
-        setCurrentUser(null);
+        setCurrentUserAndRef(null);
         setError('Your account is pending activation by an administrator. Please wait until your account is activated.');
         toast.error('Your account needs administrator activation before you can continue.');
         setLoading(false);
@@ -104,7 +107,7 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      setCurrentUser({
+      setCurrentUserAndRef({
         ...session.user,
         userId: userRow.userid,
         username: userRow.username,
@@ -117,7 +120,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
     } catch (err) {
       console.error('Error in checkUserStatus:', err);
-      setCurrentUser(null);
+      setCurrentUserAndRef(null);
       setError('An error occurred while checking your account status.');
       setLoading(false);
       supabase.auth.signOut().catch(console.error);
@@ -189,7 +192,7 @@ export function AuthProvider({ children }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      setCurrentUser(null);
+      setCurrentUserAndRef(null);
       setError(null);
       toast.success('Signed out successfully');
     } catch (error) {
