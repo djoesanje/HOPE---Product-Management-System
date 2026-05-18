@@ -29,30 +29,36 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let cancelled = false;
 
-    supabase.auth.getSession()
-      .then(({ data: { session } }) => {
-        if (cancelled) return;
+    // Safety net: if auth init stalls (e.g. token-refresh network hang),
+    // force loading to false after 8 seconds so the user is never stuck forever.
+    const bailout = setTimeout(() => {
+      if (cancelled) return;
+      setLoading(prev => {
+        if (prev) {
+          console.warn('Auth init timed out — redirecting to login.');
+          supabase.auth.signOut().catch(() => {});
+          return false;
+        }
+        return prev;
+      });
+    }, 8000);
 
-        setSession(session);
+    // In Supabase JS v2, onAuthStateChange fires INITIAL_SESSION once at
+    // startup with whatever session is stored in localStorage. This replaces
+    // the separate getSession() call and prevents the infinite-spinner bug
+    // that occurred when a stale session caused a hanging token-refresh request.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (cancelled) return;
+      setSession(session);
+
+      if (event === 'INITIAL_SESSION') {
+        // Primary initialization path — always fires on page load.
         if (session) {
-          checkUserStatus(session);
+          await checkUserStatus(session);
         } else {
           setLoading(false);
         }
-      })
-      .catch((error) => {
-        if (cancelled) return;
-
-        console.error('Auth initialization failed:', error);
-        setSession(null);
-        setCurrentUserAndRef(null);
-        setLoading(false);
-      });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-
-      if (event === 'SIGNED_IN' && session) {
+      } else if (event === 'SIGNED_IN') {
         // Guard: skip if the user is already loaded (prevents re-running
         // checkUserStatus when Supabase fires SIGNED_IN after a token refresh).
         if (!currentUserRef.current) {
@@ -68,6 +74,7 @@ export function AuthProvider({ children }) {
 
     return () => {
       cancelled = true;
+      clearTimeout(bailout);
       subscription.unsubscribe();
     };
   }, []);
