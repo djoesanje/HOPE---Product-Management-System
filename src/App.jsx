@@ -62,7 +62,7 @@ function App() {
         <Route
           path="/deleted-items"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredTypes={['ADMIN', 'SUPERADMIN']}>
               <Layout>
                 <DeletedItemsPage />
               </Layout>
