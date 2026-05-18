@@ -1,7 +1,9 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function ProtectedRoute({ children }) {
+// requiredTypes: optional array of user_type strings (e.g. ['ADMIN', 'SUPERADMIN'])
+// If provided, users not in the list are redirected to /products.
+export default function ProtectedRoute({ children, requiredTypes }) {
   const { currentUser, loading } = useAuth();
 
   if (loading) {
@@ -14,6 +16,10 @@ export default function ProtectedRoute({ children }) {
 
   if (!currentUser) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (requiredTypes && !requiredTypes.includes(currentUser.user_type)) {
+    return <Navigate to="/products" replace />;
   }
 
   return children;
