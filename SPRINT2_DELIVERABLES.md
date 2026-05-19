@@ -103,9 +103,18 @@ Verify that product soft-delete, deleted item visibility, recovery, API bypass p
 
 | Date | Task Done | Result | Notes |
 |---|---|---|---|
-|  | Created Sprint 2 rights matrix | Pending testing |  |
-|  | Created soft-delete visibility test cases | Pending testing |  |
-|  | Prepared Sprint 2 QA documentation | Pending review |  |
+| May 20, 2026 | Prepared Sprint 2 rights matrix | Completed | Added 18-case rights test matrix for USER, ADMIN, and SUPERADMIN |
+| May 20, 2026 | Prepared soft-delete visibility test cases | Completed | Added soft-delete, recovery, API bypass, and stamp visibility cases |
+| May 20, 2026 | Reviewed Sprint 2 QA requirements | Completed | Based on Sprint 2 deliverables and M5 QA responsibilities |
+| May 20, 2026 | Pending live app testing | Pending | Actual Result and Status columns will be updated after testing |
+
+---
+
+## Sprint 2 QA Summary
+
+During Sprint 2, the QA / Documentation role focused on preparing test documentation for rights enforcement, product soft-delete behavior, recovery behavior, API bypass protection, and stamp column visibility.
+
+The prepared test cases will be used to verify if the system correctly enforces permissions for USER, ADMIN, and SUPERADMIN accounts.
 
 ---
 
@@ -113,7 +122,7 @@ Verify that product soft-delete, deleted item visibility, recovery, API bypass p
 
 | Bug ID | Description | Severity | Status | Remarks |
 |---|---|---|---|---|
-| None | No bugs reported yet | - | - | - |
+| None | No bugs reported yet | - | - | Testing pending live execution |
 
 ---
 
@@ -121,15 +130,15 @@ Verify that product soft-delete, deleted item visibility, recovery, API bypass p
 
 | Blocker | Description | Status |
 |---|---|---|
-| Pending live testing | Some tests require the live app or completed Sprint 2 features | Open |
+| Pending live/system testing | Some test cases require completed Sprint 2 features and valid test accounts | Open |
 
 ---
 
 ## Next Steps
 
-- Run rights matrix tests using USER, ADMIN, and SUPERADMIN accounts.
-- Verify product soft-delete behavior.
-- Verify recovery behavior.
-- Confirm RLS protection against direct API bypass.
-- Confirm stamp column visibility based on user type.
-- Update Actual Result and Status columns after testing.
+- Run all rights matrix test cases using USER, ADMIN, and SUPERADMIN accounts.
+- Run soft-delete and recovery test cases.
+- Verify Deleted Items visibility.
+- Verify API bypass protection.
+- Verify stamp column visibility.
+- Update Actual Result and Status columns after live testing.
