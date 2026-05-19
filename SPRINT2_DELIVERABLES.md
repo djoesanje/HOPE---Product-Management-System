@@ -54,20 +54,46 @@ Verify that each user type has the correct access rights based on the Sprint 2 r
 
 ## Objective
 
-Verify that soft-delete, recovery, API bypass protection, and stamp visibility behave correctly.
+Verify that product soft-delete, deleted item visibility, recovery, API bypass protection, and stamp column visibility work correctly based on user type.
+
+---
 
 ## Soft Delete and Visibility Test Cases
 
-| Test ID | Scenario | Steps | Expected Result | Actual Result | Status | Remarks |
-|---|---|---|---|---|---|---|
-| SD-001 | SUPERADMIN soft-deletes a product | Login as SUPERADMIN → Select product → Click Delete/Soft Delete | Product record_status becomes INACTIVE |  | ⬜ |  |
-| SD-002 | USER cannot see INACTIVE product | Login as USER → Open Products page | Soft-deleted product should not appear |  | ⬜ |  |
-| SD-003 | ADMIN can see INACTIVE product in Deleted Items | Login as ADMIN → Open Deleted Items page | INACTIVE product should appear |  | ⬜ |  |
-| SD-004 | ADMIN recovers product | Login as ADMIN → Click Recover | Product becomes ACTIVE again |  | ⬜ |  |
-| SD-005 | USER can see recovered product | Login as USER → Open Products page | Recovered product should appear again |  | ⬜ |  |
-| SD-006 | Direct API bypass test | USER attempts to access products without ACTIVE filter | RLS should still block INACTIVE rows |  | ⬜ |  |
-| SD-007 | USER stamp visibility | Login as USER → Open Products page | Stamp column should be hidden |  | ⬜ |  |
-| SD-008 | ADMIN stamp visibility | Login as ADMIN → Open Products page | Stamp column should be visible |  | ⬜ |  |
+| Test ID | Feature | User Type | Test Scenario | Steps | Expected Result | Actual Result | Status | Remarks |
+|---|---|---|---|---|---|---|---|---|
+| SD-001 | Soft Delete | SUPERADMIN | Soft-delete an active product | Login as SUPERADMIN → Go to Products page → Select active product → Click Delete/Soft Delete → Confirm action | Product record_status should become INACTIVE | Pending | ⬜ | Requires SUPERADMIN account |
+| SD-002 | Soft Delete Restriction | USER | USER attempts to soft-delete a product | Login as USER → Go to Products page → Check delete button/action | Delete button should not be visible or delete action should be blocked | Pending | ⬜ | USER should not have PRD_DEL |
+| SD-003 | Soft Delete Restriction | ADMIN | ADMIN attempts to soft-delete a product | Login as ADMIN → Go to Products page → Check delete button/action | Delete button should not be visible or delete action should be blocked | Pending | ⬜ | ADMIN should not have PRD_DEL |
+| SD-004 | USER Visibility | USER | USER checks product list after soft-delete | Login as USER → Open Products page | INACTIVE product should not appear in the product list | Pending | ⬜ | Verifies ACTIVE-only visibility |
+| SD-005 | Deleted Items Visibility | ADMIN | ADMIN views deleted items | Login as ADMIN → Open Deleted Items page | INACTIVE product should appear in Deleted Items | Pending | ⬜ | ADMIN can view deleted records |
+| SD-006 | Deleted Items Visibility | SUPERADMIN | SUPERADMIN views deleted items | Login as SUPERADMIN → Open Deleted Items page | INACTIVE product should appear in Deleted Items | Pending | ⬜ | SUPERADMIN can view deleted records |
+| SD-007 | Recovery | ADMIN | ADMIN recovers a soft-deleted product | Login as ADMIN → Open Deleted Items page → Click Recover | Product record_status should become ACTIVE again | Pending | ⬜ | Recovered product should return to normal product list |
+| SD-008 | Recovery Verification | USER | USER checks recovered product | Login as USER → Open Products page | Recovered product should appear again in product list | Pending | ⬜ | Confirms successful recovery |
+| SD-009 | API Bypass Protection | USER | USER attempts to access inactive products without UI filter | Attempt direct product query without ACTIVE filter | RLS should still block INACTIVE rows from USER | Pending | ⬜ | Verifies database-level protection |
+| SD-010 | Stamp Visibility | USER | USER checks product table columns | Login as USER → Open Products page | Stamp column should be hidden | Pending | ⬜ | USER should not see stamp |
+| SD-011 | Stamp Visibility | ADMIN | ADMIN checks product table columns | Login as ADMIN → Open Products page | Stamp column should be visible | Pending | ⬜ | ADMIN should see stamp |
+| SD-012 | Stamp Visibility | SUPERADMIN | SUPERADMIN checks product table columns | Login as SUPERADMIN → Open Products page | Stamp column should be visible | Pending | ⬜ | SUPERADMIN should see stamp |
+
+---
+
+## PR-02 QA Summary
+
+| Item | Result |
+|---|---|
+| Soft-delete test cases prepared | Pending execution |
+| Recovery test cases prepared | Pending execution |
+| API bypass test case prepared | Pending execution |
+| Stamp visibility test cases prepared | Pending execution |
+| Final status | Pending live/system testing |
+
+---
+
+## Notes
+
+- These test cases are prepared based on Sprint 2 requirements.
+- Actual Result and Status columns will be updated after testing the completed Sprint 2 features.
+- Some tests require valid USER, ADMIN, and SUPERADMIN accounts.
 
 ---
 
