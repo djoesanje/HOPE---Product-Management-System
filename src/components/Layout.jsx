@@ -3,8 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useRights } from '../contexts/UserRightsContext';
 import { 
   Package, 
-  BarChart3,
-  TrendingUp,
+  BarChart3, 
   Users, 
   Trash2, 
   LogOut,
@@ -25,17 +24,15 @@ export default function Layout({ children }) {
     navigate('/login');
   };
 
-  const canViewDeleted  = ['ADMIN', 'SUPERADMIN'].includes(currentUser?.user_type);
-  const canViewRep001   = hasRight('REP_001');
-  const canViewRep002   = hasRight('REP_002');
-  const canViewAdmin    = hasRight('ADM_USER');
+  const canViewDeleted = ['ADMIN', 'SUPERADMIN'].includes(currentUser?.user_type);
+  const canViewReports = hasRight('REP_001') || hasRight('REP_002');
+  const canViewAdmin = hasRight('ADM_USER');
 
   const navigation = [
-    { name: 'Products',        href: '/products',     icon: Package,  show: true },
-    { name: 'Product Report',  href: '/reports',      icon: BarChart3, show: canViewRep001 },
-    { name: 'Top Selling',     href: '/reports',      icon: TrendingUp, show: canViewRep002 },
-    { name: 'Deleted Items',   href: '/deleted-items', icon: Trash2,  show: canViewDeleted },
-    { name: 'User Management', href: '/admin/users',  icon: Users,    show: canViewAdmin },
+    { name: 'Products', href: '/products', icon: Package, show: true },
+    { name: 'Reports', href: '/reports', icon: BarChart3, show: canViewReports },
+    { name: 'Deleted Items', href: '/deleted-items', icon: Trash2, show: canViewDeleted },
+    { name: 'User Management', href: '/admin/users', icon: Users, show: canViewAdmin },
   ];
 
   return (
