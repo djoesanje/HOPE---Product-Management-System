@@ -8,11 +8,6 @@ import toast from 'react-hot-toast';
 export default function DeletedItemsPage() {
   const { currentUser } = useAuth();
 
-  // Block USER accounts at the page level (route guard also handles this)
-  if (!['ADMIN', 'SUPERADMIN'].includes(currentUser?.user_type)) {
-    return <Navigate to="/products" replace />;
-  }
-
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [recoveringCode, setRecoveringCode] = useState(null);
@@ -34,6 +29,11 @@ export default function DeletedItemsPage() {
   useEffect(() => {
     loadDeletedProducts();
   }, [loadDeletedProducts]);
+
+  // Block USER accounts at the page level (route guard also handles this)
+  if (!['ADMIN', 'SUPERADMIN'].includes(currentUser?.user_type)) {
+    return <Navigate to="/products" replace />;
+  }
 
   const handleRecover = async (product) => {
     setRecoveringCode(product.prodcode);
