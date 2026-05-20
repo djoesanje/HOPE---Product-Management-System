@@ -1,6 +1,6 @@
 # HOPE, Inc. — Product Management System
 
-A secure, role-aware web application for managing products and price history, built as a capstone project for the **BS Information Technology** program at **New Era University — College of Computer Studies** (Information Management 2, A.Y. 2025–2026).
+A secure, role-aware web application for managing products and price history, built as a project for the **BS Information Technology** program at **New Era University — College of Computer Studies** (Information Management 2, A.Y. 2025–2026).
 
 ## Table of Contents
 
