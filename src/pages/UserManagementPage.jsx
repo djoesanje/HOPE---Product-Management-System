@@ -25,11 +25,6 @@ export default function UserManagementPage() {
   const { currentUser } = useAuth();
   const { hasRight, loading: rightsLoading } = useRights();
 
-  // Block access if ADM_USER right is not granted
-  if (!rightsLoading && !hasRight('ADM_USER')) {
-    return <Navigate to="/products" replace />;
-  }
-
   const [users, setUsers]           = useState([]);
   const [loading, setLoading]       = useState(true);
   const [togglingId, setTogglingId] = useState(null);
@@ -49,6 +44,11 @@ export default function UserManagementPage() {
   }, []);
 
   useEffect(() => { loadUsers(); }, [loadUsers]);
+
+  // Block access if ADM_USER right is not granted
+  if (!rightsLoading && !hasRight('ADM_USER')) {
+    return <Navigate to="/products" replace />;
+  }
 
   const handleToggle = async (user, newStatus) => {
     setTogglingId(user.userid);
